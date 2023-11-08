@@ -119,8 +119,8 @@ Saya melakukan beberapa tahapan berikut:
 
 </details>
 
-<detail>
-<summary>Membuat Struktur Proyek</summary>
+<details>
+<summary> Membuat Struktur Proyek </summary>
 
 tahapan yang saya lakukan:
 
