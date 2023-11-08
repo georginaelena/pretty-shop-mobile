@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class ShopItem {
   final String name;
   final IconData icon;
+  final Color color;
 
-  ShopItem(this.name, this.icon);
+  ShopItem(this.name, this.icon, this.color);
 }
 
 class ShopCard extends StatelessWidget {
@@ -15,7 +16,7 @@ class ShopCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.indigo,
+      color: item.color,
       child: InkWell(
         // Area responsive terhadap sentuhan
         onTap: () {
@@ -55,21 +56,23 @@ class ShopCard extends StatelessWidget {
  class MyHomePage extends StatelessWidget {
     MyHomePage({Key? key}) : super(key: key);
 
-    final List<ShopItem> items = [
-    ShopItem("Lihat Produk", Icons.checklist),
-    ShopItem("Tambah Produk", Icons.add_shopping_cart),
-    ShopItem("Logout", Icons.logout),
-    ];
+    
+  // Menggunakan Colors.pinkAccent untuk warna pink terang
+  final List<ShopItem> items = [
+    ShopItem("Lihat Item", Icons.checklist, Color.fromARGB(255, 255, 205, 224)),
+    ShopItem("Tambah Item", Icons.add_shopping_cart, Color.fromARGB(255, 255, 184, 253)),
+    ShopItem("Logout", Icons.logout, Color.fromARGB(255, 174, 235, 255)),
+  ];
 
     @override
     Widget build(BuildContext context) {
         return Scaffold(
             appBar: AppBar(
               title: const Text(
-                'Shopping List',
+                'Hi! Welcome to',
               ),
               foregroundColor: Colors.white,
-              backgroundColor: Colors.indigo,
+              backgroundColor: const Color.fromARGB(169, 255, 0, 85),
             ),
             body: SingleChildScrollView(
               // Widget wrapper yang dapat discroll
@@ -82,7 +85,7 @@ class ShopCard extends StatelessWidget {
                       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                       // Widget Text untuk menampilkan tulisan dengan alignment center dan style yang sesuai
                       child: Text(
-                        'PBP Shop', // Text yang menandakan toko
+                        'Pretty Shop', // Text yang menandakan toko
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 30,
