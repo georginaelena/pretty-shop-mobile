@@ -1,6 +1,10 @@
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:pretty_shop/screens/list_item.dart';
+import 'package:pretty_shop/screens/login.dart';
 import 'package:pretty_shop/screens/shoplist_form.dart';
-import 'package:pretty_shop/widgets/shoplist_page.dart';
+// import 'package:pretty_shop/widgets/shoplist_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ShopItem {
   final String name;
@@ -10,18 +14,18 @@ class ShopItem {
   ShopItem(this.name, this.icon, this.color);
 }
 
-class ShopItemList {
-  final String nama;
-  final int harga;
-  final String deskripsi;
+// class ShopItemList {
+//   final String nama;
+//   final int harga;
+//   final String deskripsi;
 
-  ShopItemList({
-    required this.nama,
-    required this.harga,
-    required this.deskripsi,
-  });
-}
-List<ShopItemList> shopList = [];
+//   ShopItemList({
+//     required this.nama,
+//     required this.harga,
+//     required this.deskripsi,
+//   });
+// }
+// List<ShopItemList> shopList = [];
 
 class ShopCard extends StatelessWidget {
   final ShopItem item;
@@ -30,11 +34,13 @@ class ShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    
     return Material(
       color: item.color,
       child: InkWell(
         // Area responsive terhadap sentuhan
-        onTap: () {
+        onTap: () async {
           // Memunculkan SnackBar ketika diklik
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -49,14 +55,33 @@ class ShopCard extends StatelessWidget {
             );
           }
           
-          else if (item.name == "Lihat Item"){
-            Navigator.pushReplacement(
+          else if (item.name == "Lihat Item") {
+            Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => ShopListPage(shopList: shopList),
-              ),
-            );
+                MaterialPageRoute(
+                  builder: (context) => const ProductPage()));
           }
+          
+          else if (item.name == "Logout") {
+            final response = await request.logout(
+                "https://georgina-elena-tugas.pbp.cs.ui.ac.id/auth/logout/");
+            String message = response["message"];
+            
+            if (response['status']) {
+              String uname = response["username"];
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("$message Sampai jumpa, $uname."),
+              ));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("$message"),
+              ));
+            }
+          } 
         },
 
         child: Container(

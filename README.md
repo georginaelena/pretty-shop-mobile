@@ -950,3 +950,164 @@ else if (item.name == "Lihat Item"){
 
 
 </details>
+
+<details>
+
+<summary>Tugas 9: Integrasi Layanan Web Django dengan Aplikasi Flutter</summary>
+
+<br>
+
+# TUGAS 9🥵
+Proyek ini dibuat dengan tujuan memenuhi Tugas 8 Pemrograman Berbasis Platform. Saya akan menjelaskan beberapa poin-poin berikut:
+
+1. Apakah kita bisa melakukan pengambilan data JSON tanpa membuat model terlebih dahulu?
+2. Fungsi dari CookieRequest
+3. Mekanisme pengambilan data dari JSON hingga dapat ditampilkan pada Flutter
+4. Mekanisme autentikasi dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter
+5. Seluruh widget yang saya gunakan
+6. Implementasi Proyek
+
+## Apakah kita bisa melakukan pengambilan data JSON tanpa membuat model terlebih dahulu?
+Iya bisa, kita dapat melakukan pengambilan data JSON tanpa membuat model terlebih dahulu. Namun, hal ini tidak terlalu disarankan karena JSON menggunakan syntax JavaScript yang mana cukup krusial untuk terjadi suatu error ketika berinteraksi dengan JSON polos karena terdapat perbedaan syntax. Jadi sebaiknya, kita membuat model terlebih dahulu untuk memastikan JSON telah dikonversi ke syntax pemrograman yang sedang kita gunakan sehingga lebih aman untuk mengolah suatu data.
+
+
+## Fungsi dari CookieRequest
+
+menyediakan akses ke data cookie yang dibutuhkan oleh berbagai bagian dari aplikasi. CookieRequest diperlukan untuk dibagikan ke semua komponen di aplikasi Flutter agar komponen-komponen yang berbeda dapat mengakses dan menggunakan data cookie tanpa perlu membuat instance CookieRequest baru setiap kali. Membagikan instance CookieRequest ke semua komponen mempermudah koordinasi dan pertukaran data antar komponen dalam aplikasi agar dapat meningkatkan efisiensi dan memastikan konsistensi dalam penggunaan data cookie di seluruh aplikasi Flutter.
+
+## Mekanisme pengambilan data dari JSON hingga dapat ditampilkan pada Flutter
+
+1. Mengirimkan GET Request ke url `https://georgina-elena-tugas.pbp.cs.ui.ac.id/get-item/` untuk mendapatkan JSON yang berisi list of Items.
+    ```dart
+    var url = Uri.parse('https://georgina-elena-tugas.pbp.cs.ui.ac.id/get-item/');
+        var response = await http.get(
+          url,
+          headers: {"Content-Type": "application/json"},
+        );
+    ```
+2. Menggunakan `jsonDecode` untuk mengubah http response body menjadi bentuk JSON.
+    ```dart
+    var data = jsonDecode(utf8.decode(response.bodyBytes));
+    ```
+3. Membuat object Item menggunakan data JSON yang telah didapatkan kemudian menyimpannya dalam `list_item`.
+    ```dart
+    List<Item> list_item = [];
+    for (var d in data) {
+      if (d != null) {
+        list_item.add(Item.fromJson(d));
+      }
+    }
+    return list_item;
+    ```
+4. Menampilkan semua Item menggunakan `ListView.builder()`. Setiap Item ditampilkan menggunakan `Card()` yang dibungkus oleh `InkWell()`.
+    ```dart
+    ListView.builder(
+      itemCount: snapshot.data!.length,
+      itemBuilder: (_, index) => InkWell(
+            ...
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                ...
+              ),
+            ),
+      )
+    )
+    ```
+5. Jika suatu Item diklik, maka seluruh data Item tersebut akan dikirimkan ke halaman `DetailItem()` untuk kemudian ditampilkan secara lebih detail.
+    ```dart
+    onTap: () {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) {
+        return DetailItem(
+            fields: snapshot.data![index].fields);
+      }));
+    },
+    ```
+
+## Mekanisme autentikasi
+
+1. Membuat object `request` menggunakan `CookieRequest`.
+    ```dart
+    final request = context.watch<CookieRequest>();
+    ```
+2. Mengambil input `Username` dan `Password` dari pengguna menggunakan `TextFormField()`.
+3. Mengirimkan data Username dan Password ke url https://georgina-elena-tugas.pbp.cs.ui.ac.id/auth/login/ dengan melakukan login request.
+    ```dart
+    final response =
+        await request.login("https://georgina-elena-tugas.pbp.cs.ui.ac.id/auth/login/", {
+      'username': username,
+      'password': password,
+    });
+    ```
+4. Jika autentikasi berhasil, maka pengguna diarahkan ke halaman `MyHomePage()`. Jika gagal maka akan ditampilkan `AlertDialog()` berisi pesan bahwa login gagal.
+    ```dart
+    if (request.loggedIn) {
+      ...
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyHomePage()),
+      );
+      ...
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          ...
+        ),
+      );
+    }
+    ```
+
+
+## Seluruh widget yang saya gunakan
+
+1. `Provider`: menyediakan objek atau data untuk diakses oleh widget di bawahnya.
+
+2. `LeftDrawer`: menampilkan drawer di bagian kiri pada halaman utama. 
+
+3. `TextFormField`: menerima input teks dari pengguna pada formulir. 
+
+4. `ElevatedButton`: menampilkan tombol untuk memicu tindakan tertentu.
+
+5. `Row`: mengatur letak *children* widgetnya secara horizontal.
+
+6. `ListView`: mengatur letak *children* widgetnya dalam sebuah *scrollable list* secara vertikal.
+
+7. `FutureBuilder`:  membangun antarmuka pengguna berdasarkan hasil dari sebuah **Future**, yang biasanya digunakan untuk menangani operasi asinkron seperti permintaan HTTP, pembacaan file, atau tugas-tugas asinkron 
+lainnya. 
+
+8. `CircularProgressIndicator`: indikator *loading* ketika aplikasi sedang menunggu data dari server.
+
+9. `Navigator.push`: menambahkan rute lain ke atas tumpukan *screen* (*stack*) saat ini.
+
+10. `Navigator.pushReplacement`: mengganti rute paling atas tumpukan *screen* (*stack*) saat ini.
+
+11. `MaterialPageRoute`: memberikan efek animasi ketika berpindah layar.
+
+12. `Align`: menempatkan *child* widget di dalamnya secara relatif terhadap posisi yang ditentukan di dalam *parent*. 
+
+13. `SizedBox`: memberikan dimensi tetap pada *child* widget di dalamnya. 
+
+14. `NumberFormat.decimalPattern`: memformat angka dengan pemisah ribuan.
+
+
+## Implementasi Proyek
+
+1. Memastikan deployment proyek tugas Django kamu telah berjalan dengan baik.
+    - sudah aman
+2. Membuat halaman login pada proyek tugas Flutter.
+    - Menambahkan dan menjalankan dependensi yang diperlukan dalam proyek Flutter (`provider`, `pbp_django_auth`, `http`)
+    - Menyediakan library `CookieRequest` ke semua widget anak menggunakan Provider pada file `menu.dart`
+3. Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter.
+    - Membuat file `login.dart` di direktori `screens`.
+    - Membuat tampilan formulir dan mengarahkan ke `main.dart`
+    - Modifikasi `menu.dart` di direktori `screens` agar tombol logout dapat membuat pengguna keluar dari aplikasi dan kembali ke halaman login (gunakan Provider untuk mengelola status login).
+4. Membuat model kustom sesuai dengan proyek aplikasi Django.
+    - Modifikasi file `shoplist_form.dart` di direktori `screens` untuk mengubah input menjadi format JSON dan mengirimkannya ke server.
+5. Membuat halaman yang berisi daftar semua item yang terdapat pada endpoint JSON di Django yang telah kamu deploy.
+    - Membuat file `list_item.dart` di direktori `screens` untuk menampilkan list semua Item yang diambil dari server.
+6. Membuat halaman detail untuk setiap item yang terdapat pada halaman daftar Item.
+    - Mmebuat file `item_details.dart` di direktori screens. File ini akan menampilkan semua informasi Item dengan detail.
+
+</details>

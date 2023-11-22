@@ -1,8 +1,9 @@
-import 'package:pretty_shop/screens/menu.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:pretty_shop/screens/menu.dart';
 import 'package:pretty_shop/widgets/left_drawer.dart';
-import 'package:pretty_shop/widgets/shop_card.dart';
-
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class ShopFormPage extends StatefulWidget {
     const ShopFormPage({super.key});
@@ -12,58 +13,45 @@ class ShopFormPage extends StatefulWidget {
 }
 
 class _ShopFormPageState extends State<ShopFormPage> {
+    final _formKey = GlobalKey<FormState>();
+    String _name = "";
+    int _price = 0;
+    String _description = "";
 
-  final _formKey = GlobalKey<FormState>();
-  String _nama = "";
-  int _harga = 0;
-  String _deskripsi = "";
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Add Your Favorite Accessories!!',
+    @override
+    Widget build(BuildContext context) {
+      final request = context.watch<CookieRequest>();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Center(
+              child: Text(
+                'Pretty Request Form',
+              ),
+            ),
+            backgroundColor: Colors.indigo,
+            foregroundColor: Colors.white,
           ),
-        ),
-        backgroundColor: Color.fromARGB(255, 138, 233, 219),
-        foregroundColor: Colors.white,
-      ),
-      drawer: const LeftDrawer(),
-      body: Container(
-        color: Color.fromARGB(255, 231, 195, 238),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Nama Aksesoris✨',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 29, 24, 63),
-                      ),
-                    ),
-                    TextFormField(
+          drawer: const LeftDrawer(),
+          body: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
                       decoration: InputDecoration(
-                        hintText: "Masukan nama aksesoris",
-                        labelText: "",
+                        hintText: "Nama Produk",
+                        labelText: "Nama Produk",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        fillColor: Color.fromARGB(255, 229, 170, 239),
-                        filled: true,
                       ),
                       onChanged: (String? value) {
                         setState(() {
-                          _nama = value!;
+                          _name = value!;
                         });
                       },
                       validator: (String? value) {
@@ -73,35 +61,20 @@ class _ShopFormPageState extends State<ShopFormPage> {
                         return null;
                       },
                     ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Harga Aksesoris💸',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 29, 24, 63),
-                      ),
-                    ),
-                    TextFormField(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
                       decoration: InputDecoration(
-                        hintText: "Masukan harga yang diinginkan",
-                        labelText: "",
+                        hintText: "Harga",
+                        labelText: "Harga",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        fillColor: Color.fromARGB(255, 229, 170, 239),
-                        filled: true,
                       ),
                       onChanged: (String? value) {
                         setState(() {
-                          _harga = int.parse(value!);
+                          _price = int.parse(value!);
                         });
                       },
                       validator: (String? value) {
@@ -114,36 +87,20 @@ class _ShopFormPageState extends State<ShopFormPage> {
                         return null;
                       },
                     ),
-                  ],
-                )
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Deskripsi✨',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 29, 24, 63),
-                      ),
-                    ),
-                    TextFormField(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
                       decoration: InputDecoration(
-                        hintText: "Masukan deskripsi",
-                        labelText: "",
+                        hintText: "Deskripsi",
+                        labelText: "Deskripsi",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        fillColor: Color.fromARGB(255, 229, 170, 239),
-                        filled: true,
                       ),
-                      maxLines: 5,
                       onChanged: (String? value) {
                         setState(() {
-                          _deskripsi = value!;
+                          _description = value!;
                         });
                       },
                       validator: (String? value) {
@@ -153,70 +110,57 @@ class _ShopFormPageState extends State<ShopFormPage> {
                         return null;
                       },
                     ),
-                  ],
-                )
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.indigo),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ShopItemList newItem = ShopItemList(nama: _nama, harga: _harga, deskripsi: _deskripsi);
-                        shopList.add(newItem);
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Pesanan aksesoris berhasil ditambahkan'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Nama: $_nama'),
-                                    Text('Harga: $_harga'),
-                                    Text('Deskripsi: $_deskripsi'),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.indigo),
+                        ),
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                              // Kirim ke Django dan tunggu respons
+                              // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+                              final response = await request.postJson(
+                              "https://georgina-elena-tugas.pbp.cs.ui.ac.id/create-flutter/",
+                              jsonEncode(<String, String>{
+                                  'name': _name,
+                                  'price': _price.toString(),
+                                  'description': _description,
+                                  // TODO: Sesuaikan field data sesuai dengan aplikasimu
+                              }));
+                              if (response['status'] == 'success') {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                  content: Text("Produk baru berhasil disimpan!"),
+                                  ));
+                                  Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MyHomePage(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      _formKey.currentState!.reset();
-                      }
-                    },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
+                                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                                  );
+                              } else {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                      content:
+                                          Text("Terdapat kesalahan, silakan coba lagi."),
+                                  ));
+                              }
+                          }
+                      },
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ]
               ),
-            ]
-          ),
-        ),
-      ),
-      )
-    );
-  }
+            ),
+          )
+        );
+      }
 }

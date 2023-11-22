@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pretty_shop/widgets/left_drawer.dart';
 import 'package:pretty_shop/widgets/shop_card.dart';
 
-
 class MyHomePage extends StatelessWidget {
     MyHomePage({Key? key}) : super(key: key);
     final List<ShopItem> items = [
